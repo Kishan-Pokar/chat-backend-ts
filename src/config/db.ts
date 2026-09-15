@@ -16,4 +16,8 @@ export const connectDB = async (): Promise<void> => {
   }
 };
 
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle Postgres client', err);
+});
+
 export default pool;
