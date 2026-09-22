@@ -29,3 +29,10 @@ export const findUser = async (email: string): Promise<User | null> => {
   return result.rows[0] || null;
 };
 
+export const getTheUsers = async (): Promise<User[]> => {
+  const result: QueryResult<User> = await pool.query(
+    `SELECT id, username, email FROM users`
+  );
+  return result.rows;
+};
+
