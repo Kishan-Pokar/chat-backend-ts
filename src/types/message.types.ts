@@ -8,6 +8,6 @@ export interface Message{
 }
 
 export interface SendMessagePayload {
-  to: string;
-  content: string;
+    to: string;
+    content: string;
 }

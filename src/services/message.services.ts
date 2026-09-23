@@ -2,7 +2,7 @@ import { Server, Socket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import { SendMessagePayload } from "../types/message.types";
 import { Message } from "../types/message.types";
-import { saveMessage, updateMessageStatus,getAllMessages,getUndeliveredMessages } from "../repositories/message.repository";
+import { saveMessage, updateMessageStatus,getAllMessages,getUndeliveredMessages,updateMessageStatusToRead } from "../repositories/message.repository";
 import { getSocketId } from "./presence.services";
 import { AppError } from "../utils/AppError";
 
@@ -41,22 +41,53 @@ export const createMessage= async(
     io.to(receiverSocketId).emit("receive_message", { ...message, status: "SENT" });
 }
 
-export const markDelivered = async (messageId:string) : Promise<void> => {
-    await updateMessageStatus(messageId,'DELIVERED')
-}
+export const markDelivered = async (io: Server, messageId: string): Promise<void> => {
+  const updated = await updateMessageStatus(messageId, 'DELIVERED');
+
+  if (!updated) {
+    return; // message ID didn't match anything — nothing to notify
+  }
+
+  const senderSocketId = await getSocketId(updated.sender_id);
+  if (senderSocketId) {
+    io.to(senderSocketId).emit('message_delivered', { messageId });
+  }
+};
 
 export const deliverPendingMessage = async (socket:Socket,userId:string) : Promise<void> => {
     const pendingMessages = await getUndeliveredMessages(userId)
     if(!pendingMessages){
         return
     }
-    for(const msg of pendingMessages){
+    const updatedMessages = pendingMessages.map((msg) => ({ ...msg, status: "SENT" }));
+    for(const msg of updatedMessages){
         await updateMessageStatus(msg.id, 'SENT');
     }
-    socket.emit('offline_messages', pendingMessages);
+    socket.emit('offline_messages', updatedMessages);
 }
 
 export const getChatHistory = async (userId:string,otherUserId:string) : Promise<Message[] | null> => {
     const chatHistory = await getAllMessages(userId,otherUserId)
     return chatHistory
 }
+
+export const markRead = async (io: Server, socket: Socket, fromUserId: string): Promise<void> => {
+    const toUserId = socket.data.userId as string;
+    if (!toUserId) {
+        throw new AppError("toUser Id is required", 400);
+    }
+
+    const updatedMessageIds = await updateMessageStatusToRead(fromUserId, toUserId);
+
+    if (updatedMessageIds.length === 0) {
+        return; // nothing was actually unread — nothing to notify
+    }
+
+    const senderSocketId = await getSocketId(fromUserId);
+    if (senderSocketId) {
+        io.to(senderSocketId).emit('messages_read', {
+        readBy: toUserId,
+        messageIds: updatedMessageIds,
+        });
+    }
+};
