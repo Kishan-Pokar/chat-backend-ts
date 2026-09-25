@@ -1,15 +1,16 @@
-import { markDelivered,createMessage,markRead,deliverPendingMessage } from "../services/message.services";
-import { Socket,Server } from "socket.io";
+import { markDelivered, createMessage, markRead, deliverPendingMessage } from "../services/message.services";
+import { Socket, Server } from "socket.io";
 import { SendMessagePayload } from "../types/message.types";
 import { AppError } from "../utils/AppError";
 
-export const messageHandler = (io:Server,socket:Socket,userId:string) => {
+export const messageHandler = (io: Server, socket: Socket, userId: string) => {
     console.log(`message handler is running for userId : ${userId}`);
 
     socket.on('send_message', async (payload: SendMessagePayload) => {
         try {
             await createMessage(io, socket, payload);
         } catch (err) {
+            console.error('send_message failed:', err);
             socket.emit('error', {
                 message: err instanceof AppError ? err.message : 'Something went wrong',
             });
@@ -20,6 +21,7 @@ export const messageHandler = (io:Server,socket:Socket,userId:string) => {
         try {
             await markDelivered(io, messageId);
         } catch (err) {
+            console.error('message_ack failed:', err);
             socket.emit('error', { message: 'Something went wrong' });
         }
     });
@@ -27,7 +29,8 @@ export const messageHandler = (io:Server,socket:Socket,userId:string) => {
     socket.on('fetch_offline_messages', async () => {
         try {
             await deliverPendingMessage(socket, userId);
-        }catch(err) {
+        } catch (err) {
+            console.error('fetch_offline_messages failed:', err);
             socket.emit('error', {
                 message: err instanceof AppError ? err.message : 'Something went wrong',
             });
@@ -38,6 +41,7 @@ export const messageHandler = (io:Server,socket:Socket,userId:string) => {
         try {
             await markRead(io, socket, fromUserId);
         } catch (err) {
+            console.error('chat-opened failed:', err);
             socket.emit('error', { message: 'Something went wrong' });
         }
     });

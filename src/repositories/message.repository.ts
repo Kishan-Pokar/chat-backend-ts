@@ -2,7 +2,7 @@ import pool from '../config/db';
 import { Message } from '../types/message.types';
 
 
-export const saveMessage = async (message:Message) : Promise<void> => {
+export const saveMessage = async (message: Message): Promise<void> => {
     const query = `
     INSERT INTO messages (id, sender_id, receiver_id, content, timestamp, status)
     VALUES ($1, $2, $3, $4, $5, $6)
@@ -15,7 +15,7 @@ export const saveMessage = async (message:Message) : Promise<void> => {
         message.timestamp,
         message.status
     ];
-    await pool.query(query,values)
+    await pool.query(query, values)
 }
 
 export const updateMessageStatus = async (
@@ -29,7 +29,7 @@ export const updateMessageStatus = async (
     return rows[0] || null;
 };
 
-export const getUndeliveredMessages = async (userId:string) : Promise<Message[] | null> => {
+export const getUndeliveredMessages = async (userId: string): Promise<Message[] | null> => {
     const { rows } = await pool.query(
         `SELECT 
             id,
@@ -62,7 +62,7 @@ export const getAllMessages = async (sender_id: string, receiver_id: string): Pr
     return rows;
 }
 
-export const updateMessageStatusToRead = async (fromUserId:string,toUserId:string) : Promise<string[]> => {
+export const updateMessageStatusToRead = async (fromUserId: string, toUserId: string): Promise<string[]> => {
     const { rows } = await pool.query(
         `UPDATE messages
         SET status = 'READ'

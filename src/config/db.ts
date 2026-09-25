@@ -1,23 +1,23 @@
-import {Pool} from 'pg' 
+import { Pool } from 'pg'
 import { config } from './index'
 
 const pool = new Pool({
-  connectionString: config.databaseUrl,
-  ssl: config.nodeEnv === 'production' ? { rejectUnauthorized: false } : false
+    connectionString: config.databaseUrl,
+    ssl: config.nodeEnv === 'production' ? { rejectUnauthorized: false } : false
 });
 
 export const connectDB = async (): Promise<void> => {
-  try {
-    await pool.query('SELECT 1');
-    console.log('Database connected successfully');
-  } catch (error) {
-    console.error('Database connection failed:', error);
-    process.exit(1);  
-  }
+    try {
+        await pool.query('SELECT 1');
+        console.log('Database connected successfully');
+    } catch (error) {
+        console.error('Database connection failed:', error);
+        process.exit(1);
+    }
 };
 
 pool.on('error', (err) => {
-  console.error('Unexpected error on idle Postgres client', err);
+    console.error('Unexpected error on idle Postgres client', err);
 });
 
 export default pool;

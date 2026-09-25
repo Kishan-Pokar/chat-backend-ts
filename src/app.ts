@@ -1,23 +1,23 @@
-import express,{Application} from 'express'
+import express, { Application } from 'express'
 import healthRoutes from './routes/health.routes'
 import cors from 'cors'
 import userRoutes from './routes/user.routes'
 import messageRoutes from './routes/message.routes';
-import {errorHandler} from './middlewares/errorHandler'
+import { errorHandler } from './middlewares/errorHandler'
 
 
-const app:Application = express();
+const app: Application = express();
 app.use(express.json());
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://realtime-chat-app-two-jade.vercel.app'
-  ],
-  credentials: true
+    origin: [
+        'http://localhost:3000',
+        'https://realtime-chat-app-two-jade.vercel.app'
+    ],
+    credentials: true
 }));
 
-app.use('/health',healthRoutes);
-app.use('/users',userRoutes);
+app.use('/health', healthRoutes);
+app.use('/users', userRoutes);
 app.use('/messages', messageRoutes);
 
 app.use(errorHandler);

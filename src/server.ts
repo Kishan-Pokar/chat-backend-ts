@@ -1,6 +1,6 @@
 import app from './app';
-import {config} from './config/index'
-import {connectDB} from './config/db'
+import { config } from './config/index'
+import { connectDB } from './config/db'
 import { connectRedis } from './config/redis';
 import http from "http";
 import "dotenv/config";

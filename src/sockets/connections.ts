@@ -12,6 +12,7 @@ export const connection = async (io: Server, socket: Socket): Promise<void> => {
     }
 
     try {
+        messageHandler(io, socket, userId);
         await setOnline(userId, socket.id);
         console.log(`User ${userId} connected`);
 
@@ -20,7 +21,6 @@ export const connection = async (io: Server, socket: Socket): Promise<void> => {
         const onlineUserIds = await getOnlineUserIds();
         socket.emit('online_users', onlineUserIds);
 
-        messageHandler(io, socket, userId);
     } catch (err) {
         console.error(`Error during connection setup for user ${userId}:`, err);
         socket.disconnect();
