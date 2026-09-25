@@ -10,7 +10,7 @@ export default function initializeSocket(server: HTTPServer): void {
         cors: {
             origin: [
                 'http://localhost:3000',
-                'https://realtime-chat-app-two-jade.vercel.app'
+                'https://chat-frontend-ts.vercel.app'
             ],
         }
     });

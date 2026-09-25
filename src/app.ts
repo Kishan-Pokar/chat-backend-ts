@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cors({
     origin: [
         'http://localhost:3000',
-        'https://realtime-chat-app-two-jade.vercel.app'
+        'https://chat-frontend-ts.vercel.app'
     ],
     credentials: true
 }));
