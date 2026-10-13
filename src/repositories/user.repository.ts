@@ -1,6 +1,6 @@
 import pool from '../config/db'
 import { QueryResult } from 'pg'
-import { User } from '../types/user.types'
+import { User,Groups } from '../types/user.types'
 import { AppError } from '../utils/AppError';
 
 
@@ -36,3 +36,20 @@ export const getTheUsers = async (): Promise<User[]> => {
     return result.rows;
 };
 
+export const getTheGroups = async (member_id:string): Promise<Groups[]> => {
+    const result: QueryResult<Groups> = await pool.query(
+        `SELECT
+            g.id as group_id,
+            g.creator_id,
+            g.name as group_name,
+            gm.role,
+            u.username as creator_username
+        FROM groups_name AS g
+        JOIN group_members AS gm
+            ON gm.group_id = g.id
+        JOIN users AS u
+            ON u.id = g.creator_id
+        WHERE gm.member_id = $1;`,
+        [member_id]);
+    return result.rows;
+}

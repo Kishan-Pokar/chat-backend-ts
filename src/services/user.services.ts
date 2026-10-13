@@ -1,7 +1,8 @@
 import { hash } from 'bcrypt'
-import { findUser, getTheUsers, insertUser } from '../repositories/user.repository'
+import { findUser, getTheUsers, insertUser,getTheGroups } from '../repositories/user.repository'
 import { v4 } from 'uuid'
-import { type User, type UserInput } from '../types/user.types'
+import { type User, type UserInput, Groups } from '../types/user.types'
+import { promises } from 'dns'
 
 
 export const createUser = async (userInput: UserInput): Promise<User | null> => {
@@ -31,4 +32,9 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
 export const getUsers = async (): Promise<User[] | null> => {
     const users = getTheUsers();
     return users;
+}
+
+export const getGroups = async (member_id:string): Promise<Groups[] | null> => {
+    const groups = getTheGroups(member_id);
+    return groups;
 }

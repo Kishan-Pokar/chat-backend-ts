@@ -1,4 +1,4 @@
-import { createUser, getUsers, findUserByEmail } from "../services/user.services";
+import { createUser, getUsers, findUserByEmail,getGroups } from "../services/user.services";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
@@ -55,7 +55,9 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     res.json({ token });
 });
 
-export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
+export const getAllUsersAndGroups = asyncHandler(async (req: Request, res: Response) => {
+    const { member_id } = req.body;
     const users = await getUsers();
-    res.json(users);
+    const groups = await getGroups(member_id);
+    res.json([users,groups]);
 });

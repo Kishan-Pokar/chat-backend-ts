@@ -10,3 +10,12 @@ export interface UserInput {
     email: string;
     password: string;
 }
+
+
+export interface Groups {
+    group_id: string,
+    creator_id: string,
+    group_name: string,
+    role: string,
+    creator_username:string
+}
